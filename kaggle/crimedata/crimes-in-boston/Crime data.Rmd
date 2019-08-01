@@ -1,0 +1,87 @@
+---
+title: "Crime  data"
+author: "Ranu"
+date: "8/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r loading library}
+library(foreign)
+library(tidyverse)
+library(caret)
+library(DataExplorer)
+library(randomForest)
+library(gdata)
+library(DMwR)
+library(leaflet)
+library(tabplot)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r reading files, echo=FALSE}
+crime <- read.csv("/Applications/Ranu_Imp_Skill_docs/Predictive_Modleing/kaggle/crimedata/crimes-in-boston/crime.csv")
+offense_code <- read.csv("/Applications/Ranu_Imp_Skill_docs/Predictive_Modleing/kaggle/crimedata/crimes-in-boston/offense_codes.csv")
+
+```
+
+```{r exploratory analysis, echo=FALSE}
+create_report(crime)
+create_report(offense_code)
+
+```
+
+```{r most common crimes, echo=FALSE}
+count_prominent_crime_2017 <- 
+  crime %>% 
+  select(INCIDENT_NUMBER, OFFENSE_CODE_GROUP, YEAR) %>% 
+  filter(YEAR == 2017) %>% 
+  group_by(OFFENSE_CODE_GROUP) %>% 
+  summarise(n = (n_distinct(INCIDENT_NUMBER)/1000)) %>% 
+  arrange(desc(n)) %>% 
+  head(10)
+
+ggplot(count_prominent_crime_2017, aes(x= reorder(OFFENSE_CODE_GROUP, + n), y=n)) +
+  geom_bar(stat = "identity", fill="orange") +
+  coord_flip() +
+  xlab("Offence code group") +
+  ylab("Count of offences") +
+  ggtitle("Distribution of top 10 prominent offences")
+
+count_prominent_crime_2018 <- 
+  crime %>% 
+  select(INCIDENT_NUMBER, OFFENSE_CODE_GROUP, YEAR) %>% 
+  filter(YEAR == 2018) %>% 
+  group_by(OFFENSE_CODE_GROUP) %>% 
+  summarise(n = (n_distinct(INCIDENT_NUMBER)/1000)) %>% 
+  arrange(desc(n)) %>% 
+  head(10)
+
+ggplot(count_prominent_crime_2018, aes(x= reorder(OFFENSE_CODE_GROUP, + n), y=n)) +
+  geom_bar(stat = "identity", fill="orange") +
+  coord_flip() +
+  xlab("Offence code group") +
+  ylab("Count of offences") +
+  ggtitle("Distribution of top 10 prominent offences")
+
+```
+
+```{r exploratory analysis, echo=FALSE}
+create_report(crime)
+create_report(offense_code)
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
