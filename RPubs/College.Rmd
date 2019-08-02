@@ -1,0 +1,74 @@
+---
+title: "College"
+author: "Ranu"
+date: "8/2/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r loading dataset}
+library(AER)
+library(MASS)
+library(tidyverse)
+library(DataExplorer)
+data(CollegeDistance)
+```
+
+```{r select fields, echo=FALSE}
+selected_fields <-
+  CollegeDistance %>% 
+  select(score, urban, distance, tuition, education)
+```
+
+```{r explore data, echo=FALSE}
+create_report(selected_fields)
+```
+
+```{r checking multicollinearity, echo=FALSE}
+plot(CollegeDistance[c(3,10, 11)])
+```
+
+```{r checking multicollinearity1, echo=FALSE}
+plot(CollegeDistance[c(3,10, 11)])
+```
+
+```{r correlation matrices, echo=FALSE}
+#less than 0.9, so no multicollinearity
+CollegeDistance %>% 
+  select(score, distance, tuition) %>% 
+  cor()
+
+#Calculate the VIF (Variance Inflation Factor)
+# Dataset should have VIF >10 to have multicollinearty
+score <- lm(score ~ distance + tuition, data = CollegeDistance)
+1/(1-summary(score)$r.squared)
+
+```
+
+```{r plotting, echo=FALSE}
+plot(CollegeDistance$score, CollegeDistance$education, xlab = "Years of Education", ylab = "Achievement Test Score", pch = as.numeric(CollegeDistance$urban))
+
+newscore <- jitter(CollegeDistance$score, factor = 2) # Adding some noise
+newed <- jitter(CollegeDistance$education, factor = 2) # Adding some noise
+plot(newscore, newed, xlab = "Years of Education", ylab = "Achievement Test Score", pch = as.numeric(CollegeDistance$urban))
+
+```
+
+```{r model building, echo=FALSE}
+starting.model <- lm(education ~ score + urban + distance + tuition, data = CollegeDistance)
+simple.model <- lm(education ~ 1, data = CollegeDistance)
+stepAIC(starting.model, scope = list(upper = starting.model, lower = simple.model), direction = "backward")
+
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
